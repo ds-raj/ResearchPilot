@@ -9,7 +9,9 @@ import os
 from dotenv import load_dotenv
 from constants import (
     OPENAI_MODEL,
+    OPENAI_MODEL2,
     OPENAI_API_KEY_ENV,
+    OPENROUTER_BASE_URL,
     ARXIV_RESEARCH_AGENT_NAME,
     SUMMARIZER_AGENT_NAME,
 )
@@ -21,12 +23,15 @@ from prompts import (
 load_dotenv()
 
 
-def initialize_model_client() -> OpenAIChatCompletionClient:
+def initialize_model_client(model_name: str = OPENAI_MODEL) -> OpenAIChatCompletionClient:
     """
-    Initialize and return the OpenAI model client.
+    Initialize and return the OpenRouter model client.
+    
+    Args:
+        model_name (str): The model to use. Defaults to OPENAI_MODEL.
     
     Returns:
-        OpenAIChatCompletionClient: Configured OpenAI client.
+        OpenAIChatCompletionClient: Configured OpenRouter client.
         
     Raises:
         ValueError: If API key is not found in environment variables.
@@ -34,46 +39,51 @@ def initialize_model_client() -> OpenAIChatCompletionClient:
     api_key = os.getenv(OPENAI_API_KEY_ENV)
     if not api_key:
         raise ValueError(
-            f"OPENAI_API_KEY not found in environment variables. "
+            f"OPENROUTER_API_KEY not found in environment variables. "
             f"Please set {OPENAI_API_KEY_ENV} in your .env file."
         )
     
-    return OpenAIChatCompletionClient(model=OPENAI_MODEL, api_key=api_key)
+    return OpenAIChatCompletionClient(
+        base_url=OPENROUTER_BASE_URL,
+        model=model_name,
+        api_key=api_key,
+        model_info={
+        "vision": False,
+        "function_calling": True,   # ← MUST be True for tools to work
+        "json_output": False,
+        "family": "unknown",        # use "unknown" for non-OpenAI models
+        "structured_output": False,
+    })
 
-
-def create_arxiv_research_agent(model_client: OpenAIChatCompletionClient) -> AssistantAgent:
+def create_arxiv_research_agent() -> AssistantAgent:
     """
     Create and configure the ArXiv Research Agent.
-    
-    Args:
-        model_client (OpenAIChatCompletionClient): The model client for the agent.
+    Uses OPENAI_MODEL.
         
     Returns:
         AssistantAgent: Configured ArXiv Research Agent.
     """
+    model_client = initialize_model_client(OPENAI_MODEL)
     return AssistantAgent(
         name=ARXIV_RESEARCH_AGENT_NAME,
         description="An agent that researches papers on arXiv.org.",
         model_client=model_client,
         system_message=ARXIV_RESEARCH_AGENT_SYSTEM_MESSAGE,
-        tools=[],
     )
 
 
-def create_summarizer_agent(model_client: OpenAIChatCompletionClient) -> AssistantAgent:
+def create_summarizer_agent() -> AssistantAgent:
     """
     Create and configure the Summarizer Agent.
-    
-    Args:
-        model_client (OpenAIChatCompletionClient): The model client for the agent.
+    Uses OPENAI_MODEL2.
         
     Returns:
         AssistantAgent: Configured Summarizer Agent.
     """
+    model_client = initialize_model_client(OPENAI_MODEL2)
     return AssistantAgent(
         name=SUMMARIZER_AGENT_NAME,
         description="An agent that summarizes and synthesizes research papers.",
         model_client=model_client,
         system_message=SUMMARIZER_AGENT_SYSTEM_MESSAGE,
-        tools=[],
     )

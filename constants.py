@@ -7,9 +7,13 @@ import os
 
 load_dotenv()
 
-# OpenAI Model Configuration
-OPENAI_MODEL = "gpt-4o"
-OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
+# OpenRouter Model Configuration (Free Tier)
+# Using DeepSeek R1 - Free and capable model
+# Get your free API key from: https://openrouter.ai/keys
+OPENAI_MODEL = "nvidia/nemotron-3-nano-30b-a3b:free"
+OPENAI_MODEL2 = "nvidia/nemotron-3-nano-30b-a3b:free"
+OPENAI_API_KEY_ENV = "OPENROUTER_API_KEY"
+OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 
 # ArXiv Search Configuration
 DEFAULT_MAX_RESULTS = 5

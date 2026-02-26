@@ -7,7 +7,7 @@ import asyncio
 from typing import AsyncGenerator
 from autogen_agentchat.teams import RoundRobinGroupChat
 from autogen_agentchat.agents import AssistantAgent
-from agents import initialize_model_client, create_arxiv_research_agent, create_summarizer_agent
+from agents import create_arxiv_research_agent, create_summarizer_agent
 from constants import MAX_TURNS
 import logging
 
@@ -20,10 +20,9 @@ class ResearchTeam:
     """
     
     def __init__(self):
-        """Initialize the research team with agents and model client."""
-        self.model_client = initialize_model_client()
-        self.arxiv_agent = create_arxiv_research_agent(self.model_client)
-        self.summarizer_agent = create_summarizer_agent(self.model_client)
+        """Initialize the research team with agents."""
+        self.arxiv_agent = create_arxiv_research_agent()
+        self.summarizer_agent = create_summarizer_agent()
         self.team = self._create_team()
     
     def _create_team(self) -> RoundRobinGroupChat:
@@ -57,7 +56,6 @@ class ResearchTeam:
             logger.info(f"Completed research for topic: {topic}")
         except Exception as e:
             logger.error(f"Error during research execution: {str(e)}")
-            raise
             raise
 
 

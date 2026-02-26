@@ -127,9 +127,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-@st.cache_resource
 def initialize_team():
-    """Initialize the research team (cached to avoid reinitializing)."""
+    """Initialize the research team."""
     return ResearchTeam()
 
 
